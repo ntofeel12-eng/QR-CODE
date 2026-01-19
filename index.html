@@ -1,248 +1,689 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Enterprise QR Generator PWA</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Enterprise QR Generator - Improved</title>
 
-<!-- PWA Manifest -->
-<link rel="manifest" href="data:application/manifest+json,{
-  &quot;name&quot;:&quot;Enterprise QR Generator&quot;,
-  &quot;short_name&quot;:&quot;QR Generator&quot;,
-  &quot;description&quot;:&quot;Offline QR code generator with branding, history, PDF export&quot;,
-  &quot;start_url&quot;:&quot;.&quot;,
-  &quot;display&quot;:&quot;standalone&quot;,
-  &quot;background_color&quot;:&quot;#eef2f7&quot;,
-  &quot;theme_color&quot;:&quot;#4f46e5&quot;,
-  &quot;icons&quot;:[
-    {&quot;src&quot;:&quot;https://via.placeholder.com/192&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;},
-    {&quot;src&quot;:&quot;https://via.placeholder.com/512&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/png&quot;}
-  ]
-}">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 
-<meta name="theme-color" content="#4f46e5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="QR Generator">
+  <!-- Bootstrap CSS (latest stable) -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    crossorigin="anonymous"
+  />
 
-<!-- Bootstrap & Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    rel="stylesheet"
+  />
 
-<style>
-/* --- Global --- */
-body{background:linear-gradient(135deg,#eef2f7,#f9fbff);font-family:"Segoe UI",system-ui;min-height:100vh;display:flex;flex-direction:column;margin:0;}
-.container{max-width:780px;margin:auto;padding-bottom:env(safe-area-inset-bottom);}
-.app-header{background:linear-gradient(135deg,#4f46e5,#6366f1);color:white;padding:25px;border-radius:18px;margin-bottom:25px;box-shadow:0 12px 45px rgba(79,70,229,.35);text-align:center;transition:transform 0.3s;}
-.app-header:hover{transform:scale(1.02);}
-.card{border-radius:18px;border:none;box-shadow:0 12px 50px rgba(0,0,0,.08);padding:25px;margin-bottom:30px;transition:transform 0.3s;}
-.card:hover{transform:translateY(-3px);}
-.form-label{font-weight:600;color:#374151;margin-top:1rem;}
-.form-control,.form-select{border-radius:12px;padding:14px;font-size:1rem;box-shadow:inset 0 1px 4px rgba(0,0,0,.08);}
-#qrPreview{min-height:260px;display:flex;justify-content:center;align-items:center;background:#f8fafc;border-radius:18px;border:2px dashed #c7d2fe;overflow:hidden;margin-top:1rem;position:relative;transition:all 0.3s;}
-#qrPreview:hover{background:#eef2ff;transform:scale(1.02);}
-#qrLogo{position:absolute;width:50px;height:50px;border-radius:50%;pointer-events:none;transition:transform 0.3s;}
-.sticky-bottom{position:sticky;bottom:0;background:#fff;padding:12px;border-top:1px solid #e5e7eb;z-index:10;}
-.download-btn{background:linear-gradient(135deg,#22c55e,#16a34a);border:none;padding:16px;font-size:18px;border-radius:14px;box-shadow:0 10px 25px rgba(34,197,94,.4);color:white;transition:all 0.2s;}
-.download-btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(34,197,94,.55);}
-.color-picker{width:50px;height:50px;border-radius:50%;border:2px solid #c7d2fe;cursor:pointer;margin-right:10px;}
-.color-label{display:flex;align-items:center;margin-top:10px;}
-/* --- Tabs --- */
-.nav-tabs .nav-link{font-weight:600;color:#4f46e5;}
-.nav-tabs .nav-link.active{background:#4f46e5;color:white;border-radius:10px;}
-.tab-content{margin-top:20px;}
-.history-item{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-radius:12px;background:#f8f8f8;margin-bottom:10px;box-shadow:0 4px 10px rgba(0,0,0,.05);}
-.history-item img{width:50px;height:50px;border-radius:12px;}
-.history-item button{border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;padding:6px 12px;border-radius:10px;cursor:pointer;transition:0.2s;}
-.history-item button:hover{transform:translateY(-2px);box-shadow:0 6px 15px rgba(0,0,0,.2);}
-</style>
+  <style>
+    /* Reset & base */
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 2rem auto 3rem auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgb(0 0 0 / 0.08);
+      padding: 2.5rem 2rem;
+    }
+
+    h1.app-title {
+      font-weight: 700;
+      text-align: center;
+      color: #4f46e5;
+      margin-bottom: 0.25rem;
+    }
+
+    .app-desc {
+      text-align: center;
+      font-weight: 500;
+      color: #6b7280;
+      margin-bottom: 2rem;
+    }
+
+    /* Tabs style */
+    .nav-tabs {
+      border-bottom: none;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .nav-tabs .nav-link {
+      font-weight: 600;
+      color: #4f46e5;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 14px;
+      transition: all 0.25s ease;
+    }
+    .nav-tabs .nav-link.active {
+      background: #4f46e5;
+      color: white;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35);
+    }
+    .nav-tabs .nav-link:hover:not(.active) {
+      color: #6366f1;
+      background: #eef2ff;
+    }
+
+    /* Form controls */
+    label.form-label {
+      font-weight: 600;
+      margin-top: 1rem;
+      color: #374151;
+    }
+    input[type="text"],
+    select,
+    input[type="url"] {
+      border-radius: 12px;
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+      padding: 12px 16px;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+      border: 1.5px solid #d1d5db;
+    }
+    input[type="text"]:focus,
+    select:focus,
+    input[type="url"]:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 6px rgba(79, 70, 229, 0.4);
+    }
+
+    /* Color pickers container */
+    .color-pickers {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .color-pickers label {
+      margin: 0;
+      font-weight: 600;
+      color: #374151;
+      min-width: 90px;
+    }
+    .color-picker {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #c7d2fe;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .color-picker:hover {
+      transform: scale(1.1);
+    }
+
+    /* QR Preview */
+    #qrPreview {
+      margin-top: 1.5rem;
+      border: 2px dashed #c7d2fe;
+      border-radius: 18px;
+      height: 280px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f8fafc;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    #qrPreview:hover {
+      background-color: #eef2ff;
+      box-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
+    }
+    #qrPreview img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    #qrLogo {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      box-shadow: 0 0 12px rgba(0,0,0,0.15);
+    }
+
+    /* Buttons */
+    .btn-primary-custom {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border: none;
+      padding: 14px 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+      border-radius: 14px;
+      width: 100%;
+      color: white;
+      box-shadow: 0 8px 30px rgba(79, 70, 229, 0.3);
+      transition: all 0.3s ease;
+    }
+    .btn-primary-custom:hover {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      box-shadow: 0 10px 35px rgba(79, 70, 229, 0.5);
+      transform: translateY(-3px);
+    }
+
+    /* History */
+    #historyList {
+      max-height: 360px;
+      overflow-y: auto;
+    }
+    .history-item {
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 10px 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+    }
+    .history-item img {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: white;
+      padding: 3px;
+      border: 1px solid #e5e7eb;
+    }
+    .history-item span {
+      flex-grow: 1;
+      color: #374151;
+      font-weight: 500;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-left: 8px;
+    }
+    .history-item button {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.35);
+    }
+    .history-item button:hover {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.6);
+      transform: translateY(-2px);
+    }
+
+    /* Settings */
+    #settings .form-control,
+    #settings .color-picker {
+      margin-top: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      #qrPreview {
+        height: 220px;
+      }
+      .color-pickers {
+        gap: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1 class="app-title">
+      <i class="bi bi-qr-code-scan"></i> Enterprise QR Generator
+    </h1>
+    <p class="app-desc">Offline QR code generator with branding, history & PDF export</p>
 
-<div class="container">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active"
+          id="generate-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#generate"
+          type="button"
+          role="tab"
+          aria-controls="generate"
+          aria-selected="true"
+        >
+          Generate QR
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="history-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#history"
+          type="button"
+          role="tab"
+          aria-controls="history"
+          aria-selected="false"
+        >
+          History
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="settings-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#settings"
+          type="button"
+          role="tab"
+          aria-controls="settings"
+          aria-selected="false"
+        >
+          Settings
+        </button>
+      </li>
+    </ul>
 
-<div class="app-header">
-<h2><i class="bi bi-qr-code-scan"></i> Enterprise QR Generator</h2>
-<small>Offline QR code generator with branding, history & PDF export</small>
-</div>
+    <!-- Tab content -->
+    <div class="tab-content">
+      <!-- Generate QR Tab -->
+      <div
+        class="tab-pane fade show active"
+        id="generate"
+        role="tabpanel"
+        aria-labelledby="generate-tab"
+      >
+        <label for="qrText" class="form-label">Text or URL</label>
+        <input
+          id="qrText"
+          type="text"
+          class="form-control"
+          placeholder="Enter text or URL"
+          autocomplete="off"
+          spellcheck="false"
+        />
 
-<!-- Tabs -->
-<ul class="nav nav-tabs" id="mainTabs" role="tablist">
-  <li class="nav-item"><a class="nav-link active" id="gen-tab" data-bs-toggle="tab" href="#generate" role="tab">Generate QR</a></li>
-  <li class="nav-item"><a class="nav-link" id="hist-tab" data-bs-toggle="tab" href="#history" role="tab">History</a></li>
-  <li class="nav-item"><a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings" role="tab">Settings</a></li>
-</ul>
+        <label for="qrSize" class="form-label">QR Size</label>
+        <select id="qrSize" class="form-select" aria-label="Select QR size">
+          <option value="150">Small (150x150)</option>
+          <option value="250" selected>Medium (250x250)</option>
+          <option value="350">Large (350x350)</option>
+          <option value="450">Extra Large (450x450)</option>
+        </select>
 
-<div class="tab-content">
+        <div class="color-pickers">
+          <div>
+            <label for="qrColor">QR Color</label>
+            <input
+              type="color"
+              id="qrColor"
+              class="color-picker"
+              value="#000000"
+              aria-label="QR code color"
+            />
+          </div>
+          <div>
+            <label for="bgColor">Background</label>
+            <input
+              type="color"
+              id="bgColor"
+              class="color-picker"
+              value="#ffffff"
+              aria-label="QR background color"
+            />
+          </div>
+        </div>
 
-<!-- --- Generate QR Tab --- -->
-<div class="tab-pane fade show active" id="generate" role="tabpanel">
-<div class="card">
-<label class="form-label" for="qrText">Text or URL</label>
-<input id="qrText" class="form-control" placeholder="https://example.com">
+        <label for="logoURL" class="form-label mt-3">Optional Logo URL</label>
+        <input
+          type="url"
+          id="logoURL"
+          class="form-control"
+          placeholder="https://example.com/logo.png"
+          autocomplete="off"
+          spellcheck="false"
+        />
 
-<label class="form-label" for="qrSize">QR Size</label>
-<select id="qrSize" class="form-select">
-<option value="150">Small</option>
-<option value="250" selected>Medium</option>
-<option value="350">Large</option>
-<option value="450">Extra Large</option>
-</select>
+        <div id="qrPreview" aria-live="polite" aria-label="QR code preview">
+          <span class="text-muted">Start typing to see preview</span>
+        </div>
 
-<div class="color-label">
-<label for="qrColor" class="form-label me-2">QR Color</label>
-<input type="color" id="qrColor" class="color-picker" value="#000000">
-<label for="bgColor" class="form-label me-2 ms-3">Background</label>
-<input type="color" id="bgColor" class="color-picker" value="#ffffff">
-</div>
+        <button id="downloadBtn" class="btn-primary-custom mt-4" aria-label="Download QR code as PDF" disabled>
+          <i class="bi bi-download me-2"></i> Download QR PDF
+        </button>
+      </div>
 
-<div class="color-label">
-<label for="logoURL" class="form-label me-2">Optional Logo URL</label>
-<input type="text" id="logoURL" class="form-control" placeholder="https://example.com/logo.png">
-</div>
+      <!-- History Tab -->
+      <div
+        class="tab-pane fade"
+        id="history"
+        role="tabpanel"
+        aria-labelledby="history-tab"
+      >
+        <div id="historyList" aria-live="polite" aria-label="History of generated QR codes">
+          <p class="text-muted text-center">No history yet.</p>
+        </div>
+      </div>
 
-<label class="form-label mt-3">Live Preview</label>
-<div id="qrPreview"><span class="text-muted">Start typing to see preview</span></div>
+      <!-- Settings Tab -->
+      <div
+        class="tab-pane fade"
+        id="settings"
+        role="tabpanel"
+        aria-labelledby="settings-tab"
+      >
+        <label for="defaultQRColor" class="form-label">Default QR Color</label>
+        <input
+          type="color"
+          id="defaultQRColor"
+          class="color-picker"
+          value="#000000"
+          aria-label="Default QR code color"
+        />
 
-<div class="mt-3 d-flex justify-content-between">
-<button class="download-btn w-100" onclick="generatePdf()">Download QR PDF</button>
-</div>
-</div>
-</div>
+        <label for="defaultBGColor" class="form-label mt-3">Default Background</label>
+        <input
+          type="color"
+          id="defaultBGColor"
+          class="color-picker"
+          value="#ffffff"
+          aria-label="Default QR background color"
+        />
 
-<!-- --- History Tab --- -->
-<div class="tab-pane fade" id="history" role="tabpanel">
-<div id="historyList"></div>
-</div>
+        <label for="defaultLogoURL" class="form-label mt-3">Default Logo URL</label>
+        <input
+          type="url"
+          id="defaultLogoURL"
+          class="form-control"
+          placeholder="https://example.com/logo.png"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Default logo URL"
+        />
 
-<!-- --- Settings Tab --- -->
-<div class="tab-pane fade" id="settings" role="tabpanel">
-<div class="card">
-<label class="form-label" for="defaultQRColor">Default QR Color</label>
-<input type="color" id="defaultQRColor" class="color-picker" value="#000000">
-<label class="form-label mt-3" for="defaultBGColor">Default Background</label>
-<input type="color" id="defaultBGColor" class="color-picker" value="#ffffff">
-<label class="form-label mt-3" for="defaultLogoURL">Default Logo URL</label>
-<input type="text" id="defaultLogoURL" class="form-control" placeholder="https://example.com/logo.png">
-<button class="download-btn w-100 mt-4" onclick="saveSettings()">Save Settings</button>
-</div>
-</div>
+        <button id="saveSettingsBtn" class="btn-primary-custom mt-4" aria-label="Save settings">
+          <i class="bi bi-save me-2"></i> Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
 
-</div> <!-- tab-content -->
+  <!-- JS Libraries -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-</div> <!-- container -->
+  <script>
+    (() => {
+      const qrText = document.getElementById("qrText");
+      const qrSize = document.getElementById("qrSize");
+      const qrColor = document.getElementById("qrColor");
+      const bgColor = document.getElementById("bgColor");
+      const logoURL = document.getElementById("logoURL");
+      const qrPreview = document.getElementById("qrPreview");
+      const downloadBtn = document.getElementById("downloadBtn");
 
-<!-- Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+      const defaultQRColor = document.getElementById("defaultQRColor");
+      const defaultBGColor = document.getElementById("defaultBGColor");
+      const defaultLogoURL = document.getElementById("defaultLogoURL");
+      const saveSettingsBtn = document.getElementById("saveSettingsBtn");
 
-<script>
-// --- QR Generate & Preview ---
-const qrText=document.getElementById('qrText');
-const qrSize=document.getElementById('qrSize');
-const qrPreview=document.getElementById('qrPreview');
-const qrColor=document.getElementById('qrColor');
-const bgColor=document.getElementById('bgColor');
-const logoURL=document.getElementById('logoURL');
-let qrInstance, logoImg;
+      let qrInstance = null;
+      let logoImg = null;
 
-function updatePreview(){
-    const text=qrText.value.trim();
-    const size=parseInt(qrSize.value);
-    const fg=qrColor.value;
-    const bg=bgColor.value;
-    const logoSrc=logoURL.value.trim();
-    qrPreview.innerHTML='';
-    if(!text){qrPreview.innerHTML='<span class="text-muted">Start typing to see preview</span>'; return;}
-    qrInstance=new QRCode(qrPreview,{
-        text:text,width:size,height:size,colorDark:fg,colorLight:bg,correctLevel:QRCode.CorrectLevel.H
-    });
-    if(logoSrc){
-        logoImg=new Image(); logoImg.src=logoSrc; logoImg.id='qrLogo';
-        logoImg.onload=()=>{qrPreview.appendChild(logoImg);}
-    }
-}
-[qrText, qrSize, qrColor, bgColor, logoURL].forEach(el=>el.addEventListener('input',updatePreview));
+      // Load settings from localStorage or defaults
+      function loadSettings() {
+        try {
+          const settings = JSON.parse(localStorage.getItem("qrSettings") || "{}");
+          if (settings.qrColor) {
+            qrColor.value = settings.qrColor;
+            defaultQRColor.value = settings.qrColor;
+          }
+          if (settings.bgColor) {
+            bgColor.value = settings.bgColor;
+            defaultBGColor.value = settings.bgColor;
+          }
+          if (settings.logoURL) {
+            logoURL.value = settings.logoURL;
+            defaultLogoURL.value = settings.logoURL;
+          }
+        } catch {
+          // Ignore errors
+        }
+      }
 
-// --- PDF Generation ---
-function generatePdf(){
-    if(!qrText.value.trim()){alert('Enter text first');return;}
-    const imgEl=qrPreview.querySelector('img');
-    if(!imgEl){alert('Generate QR first'); return;}
-    const { jsPDF } = window.jspdf;
-    const doc=new jsPDF();
-    const size=parseInt(qrSize.value);
-    doc.text('QR Code',105,20,null,null,'center');
-    doc.addImage(imgEl.src,'PNG',(210-size)/2,30,size,size);
-    if(logoImg) doc.addImage(logoImg.src,'PNG',(210-50)/2,30+(size/2)-25,50,50);
-    doc.save('Enterprise_QR_Code.pdf');
-    saveHistory(imgEl.src);
-}
+      // Save settings to localStorage
+      function saveSettings() {
+        const settings = {
+          qrColor: defaultQRColor.value,
+          bgColor: defaultBGColor.value,
+          logoURL: defaultLogoURL.value,
+        };
+        localStorage.setItem("qrSettings", JSON.stringify(settings));
+        // Update current form inputs
+        qrColor.value = settings.qrColor;
+        bgColor.value = settings.bgColor;
+        logoURL.value = settings.logoURL;
+        updatePreview();
+        alert("Settings saved!");
+      }
 
-// --- History Management ---
-function saveHistory(dataURL){
-    let history=JSON.parse(localStorage.getItem('qrHistory')||'[]');
-    history.unshift({time:Date.now(), data:dataURL});
-    localStorage.setItem('qrHistory',JSON.stringify(history));
-    renderHistory();
-}
-function renderHistory(){
-    const list=document.getElementById('historyList');
-    list.innerHTML='';
-    let history=JSON.parse(localStorage.getItem('qrHistory')||'[]');
-    if(history.length===0){list.innerHTML='<p class="text-muted">No history yet.</p>'; return;}
-    history.forEach((h,i)=>{
-        const div=document.createElement('div'); div.className='history-item';
-        div.innerHTML=`<img src="${h.data}"><span>${new Date(h.time).toLocaleString()}</span>
-        <button onclick="downloadHistory(${i})">Download PDF</button>`;
-        list.appendChild(div);
-    });
-}
-function downloadHistory(index){
-    let history=JSON.parse(localStorage.getItem('qrHistory')||'[]');
-    const { jsPDF } = window.jspdf;
-    const doc=new jsPDF();
-    const img=history[index].data;
-    doc.text('QR Code',105,20,null,null,'center');
-    doc.addImage(img,'PNG',30,30,150,150);
-    doc.save('QR_History_'+index+'.pdf');
-}
+      // Generate QR code preview
+      function updatePreview() {
+        const text = qrText.value.trim();
+        const size = parseInt(qrSize.value);
+        const fg = qrColor.value;
+        const bg = bgColor.value;
+        const logoSrc = logoURL.value.trim();
 
-// --- Settings Management ---
-function saveSettings(){
-    const settings={qrColor:defaultQRColor.value,bgColor:defaultBGColor.value,logoURL:defaultLogoURL.value};
-    localStorage.setItem('qrSettings',JSON.stringify(settings));
-    alert('Settings saved!');
-}
-function loadSettings(){
-    const settings=JSON.parse(localStorage.getItem('qrSettings')||'{}');
-    if(settings.qrColor) qrColor.value=settings.qrColor;
-    if(settings.bgColor) bgColor.value=settings.bgColor;
-    if(settings.logoURL) logoURL.value=settings.logoURL;
-    if(settings.qrColor) defaultQRColor.value=settings.qrColor;
-    if(settings.bgColor) defaultBGColor.value=settings.bgColor;
-    if(settings.logoURL) defaultLogoURL.value=settings.logoURL;
-    updatePreview();
-    renderHistory();
-}
-window.onload=loadSettings;
+        qrPreview.innerHTML = "";
+        downloadBtn.disabled = true;
 
-// --- Service Worker / Offline ---
-const OFFLINE_HTML='data:text/html,'+encodeURIComponent('<!DOCTYPE html><html><head><title>Offline</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;font-family:sans-serif;text-align:center;background:#fefefe;color:#333;}h1{font-size:2rem;margin-bottom:1rem;}p{font-size:1.1rem;color:#666;}</style></head><body><div><h1>⚠️ You Are Offline</h1><p>The QR Generator app is offline.<br>Check your connection and try again.</p></div></body></html>');
-if('serviceWorker' in navigator){
-    const SW_CODE=`
-    const CACHE_NAME='qr-generator-pwa-v5';
-    const ASSETS=['.','https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css','https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css','https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js','https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js','https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'];
-    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS))));
-    self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k))))));
-    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>Response.redirect('${OFFLINE_HTML}')))));
-    `;
-    const blob=new Blob([SW_CODE],{type:'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(blob)).then(()=>console.log('SW Registered')).catch(err=>console.error(err));
-}
-</script>
+        if (!text) {
+          qrPreview.innerHTML =
+            '<span class="text-muted">Start typing to see preview</span>';
+          return;
+        }
 
+        if (qrInstance) {
+          qrInstance.clear();
+          qrInstance._el.innerHTML = "";
+        }
+
+        qrInstance = new QRCode(qrPreview, {
+          text: text,
+          width: size,
+          height: size,
+          colorDark: fg,
+          colorLight: bg,
+          correctLevel: QRCode.CorrectLevel.H,
+        });
+
+        downloadBtn.disabled = false;
+
+        if (logoSrc) {
+          logoImg = new Image();
+          logoImg.src = logoSrc;
+          logoImg.id = "qrLogo";
+          logoImg.alt = "Logo";
+          logoImg.onload = () => {
+            // Append after QR code canvas generated
+            qrPreview.appendChild(logoImg);
+          };
+          logoImg.onerror = () => {
+            // Failed to load logo - remove any existing logo img
+            if (logoImg.parentElement === qrPreview) {
+              qrPreview.removeChild(logoImg);
+            }
+            logoImg = null;
+          };
+        } else {
+          if (logoImg && logoImg.parentElement === qrPreview) {
+            qrPreview.removeChild(logoImg);
+            logoImg = null;
+          }
+        }
+      }
+
+      // Save QR code image + info to history
+      function saveToHistory(text, logo, fg, bg, size) {
+        try {
+          let history = JSON.parse(localStorage.getItem("qrHistory") || "[]");
+          // Keep only last 10 entries max
+          if (history.length >= 10) history.shift();
+          history.push({ text, logo, fg, bg, size, date: new Date().toISOString() });
+          localStorage.setItem("qrHistory", JSON.stringify(history));
+          renderHistory();
+        } catch {
+          // Ignore errors
+        }
+      }
+
+      // Render history list
+      function renderHistory() {
+        const historyList = document.getElementById("historyList");
+        try {
+          let history = JSON.parse(localStorage.getItem("qrHistory") || "[]");
+          if (!history.length) {
+            historyList.innerHTML =
+              '<p class="text-muted text-center">No history yet.</p>';
+            return;
+          }
+          historyList.innerHTML = "";
+          history.forEach((item, idx) => {
+            const itemDiv = document.createElement("div");
+            itemDiv.className = "history-item";
+
+            // Create QR canvas for each item
+            const qrContainer = document.createElement("div");
+            qrContainer.style.width = "48px";
+            qrContainer.style.height = "48px";
+            qrContainer.style.flexShrink = "0";
+
+            new QRCode(qrContainer, {
+              text: item.text,
+              width: 48,
+              height: 48,
+              colorDark: item.fg,
+              colorLight: item.bg,
+              correctLevel: QRCode.CorrectLevel.H,
+            });
+
+            const textSpan = document.createElement("span");
+            textSpan.textContent = item.text;
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            delBtn.title = "Remove from history";
+            delBtn.addEventListener("click", () => {
+              history.splice(idx, 1);
+              localStorage.setItem("qrHistory", JSON.stringify(history));
+              renderHistory();
+            });
+
+            itemDiv.appendChild(qrContainer);
+            itemDiv.appendChild(textSpan);
+            itemDiv.appendChild(delBtn);
+
+            historyList.appendChild(itemDiv);
+          });
+        } catch {
+          historyList.innerHTML =
+            '<p class="text-muted text-center">Failed to load history.</p>';
+        }
+      }
+
+      // Download QR as PDF
+      async function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const size = parseInt(qrSize.value);
+        const doc = new jsPDF({
+          unit: "pt",
+          format: [size + 80, size + 80],
+        });
+
+        // Get QR canvas element
+        const qrCanvas = qrPreview.querySelector("canvas");
+        if (!qrCanvas) {
+          alert("No QR code to download");
+          return;
+        }
+        const qrDataUrl = qrCanvas.toDataURL("image/png");
+
+        // Add QR code image to PDF
+        doc.setFillColor(bgColor.value);
+        doc.rect(0, 0, size + 80, size + 80, "F");
+        doc.addImage(qrDataUrl, "PNG", 40, 40, size, size);
+
+        // Add logo if present and loaded
+        if (logoImg && logoImg.complete && logoImg.naturalWidth !== 0) {
+          const imgWidth = 60;
+          const imgHeight = 60;
+          const x = 40 + (size - imgWidth) / 2;
+          const y = 40 + (size - imgHeight) / 2;
+          doc.addImage(logoImg.src, "PNG", x, y, imgWidth, imgHeight);
+        }
+
+        // Add footer text
+        doc.setFontSize(12);
+        doc.setTextColor("#555");
+        doc.text(
+          "Generated by Enterprise QR Generator",
+          40,
+          size + 70
+        );
+
+        doc.save("enterprise-qr.pdf");
+
+        // Save current QR info to history
+        saveToHistory(
+          qrText.value.trim(),
+          logoURL.value.trim(),
+          qrColor.value,
+          bgColor.value,
+          size
+        );
+      }
+
+      // Listeners
+      qrText.addEventListener("input", updatePreview);
+      qrSize.addEventListener("change", updatePreview);
+      qrColor.addEventListener("input", updatePreview);
+      bgColor.addEventListener("input", updatePreview);
+      logoURL.addEventListener("input", updatePreview);
+      downloadBtn.addEventListener("click", downloadPDF);
+      saveSettingsBtn.addEventListener("click", saveSettings);
+
+      // Load settings & history on start
+      loadSettings();
+      renderHistory();
+      updatePreview();
+    })();
+  </script>
 </body>
 </html>
